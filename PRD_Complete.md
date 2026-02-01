@@ -50,12 +50,12 @@ This is our riskiest assumption because:
 **Backend MVP**:
 - FastAPI routers and endpoints for:
   - Image upload and processing (Google Vision OCR API)
-  - Vibe option generation (static for v1.0, contextual for v1.1)
   - Dish recommendation endpoint (GPT-4 with structured output)
-  - Feedback collection and preference updates
+  - Feedback collection
 
 **LLM Engine MVP**:
 - Basic prompt engineering for dish recommendations
+- Basic prompt engineering for generating feedback summary
 - Structured JSON input/output
 - Reasoning generation for each recommendation
 
