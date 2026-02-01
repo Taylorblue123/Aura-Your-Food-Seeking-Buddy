@@ -13,6 +13,8 @@ class SessionsRequest(BaseModel):
         default=None,
         description="Device ID for returning users (UUID format)"
     )
+
+    # TODO： Remove all in MVP or optional
     locale: constr(pattern=r'^[a-z]{2}-[A-Z]{2}$') = Field(
         description="ISO locale format (e.g., en-US, zh-CN)"
     )
@@ -41,7 +43,7 @@ class SessionPreferences(BaseModel):
         description="Dietary restrictions"
     )
 
-
+# TODO: Is this needed
 class SessionsResponse(BaseModel):
     """Response schema for session creation."""
     session_id: UUID = Field(description="UUID v4 session identifier")
@@ -104,3 +106,4 @@ class GetSessionResponse(BaseModel):
     recommendations: Optional[RecommendationSummary] = Field(default=None, description="Recommendations if generated")
     confirmation: Optional[ConfirmationSummary] = Field(default=None, description="Confirmation if dishes confirmed")
     feedback: Optional[FeedbackSummary] = Field(default=None, description="Feedback if submitted")
+
