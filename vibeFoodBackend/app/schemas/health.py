@@ -2,7 +2,7 @@
 Health check related Pydantic schemas for API responses.
 """
 from pydantic import BaseModel, Field
-from typing import Dict
+from typing import Dict, Optional
 from datetime import datetime
 
 
@@ -11,9 +11,6 @@ class ServiceStatus(BaseModel):
     status: str = Field(description="Service status: 'healthy', 'degraded', or 'unhealthy'")
     latency_ms: float = Field(default=0, description="Response latency in milliseconds")
     message: Optional[str] = Field(default=None, description="Optional status message")
-
-
-from typing import Optional
 
 
 class HealthResponse(BaseModel):

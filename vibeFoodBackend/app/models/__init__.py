@@ -7,6 +7,7 @@ from app.models.enums import (
     SessionStep,
     ExtractionMethod,
     CelebrationType,
+    PreferenceType,
 )
 from app.models.domain import (
     MenuItem,
@@ -19,6 +20,7 @@ from app.models.domain import (
     Feedback,
     Session,
 )
+from app.models.user_profile import UserProfile
 
 __all__ = [
     # Enums
@@ -27,6 +29,7 @@ __all__ = [
     "SessionStep",
     "ExtractionMethod",
     "CelebrationType",
+    "PreferenceType",
     # Domain models
     "MenuItem",
     "Restaurant",
@@ -37,4 +40,6 @@ __all__ = [
     "Confirmation",
     "Feedback",
     "Session",
+    # SQLAlchemy models
+    "UserProfile",
 ]

@@ -47,3 +47,15 @@ class CelebrationType(str, Enum):
     DATE_NIGHT = "date_night"
     BUSINESS = "business"
     CASUAL = "casual"
+
+
+class PreferenceType(str, Enum):
+    """User dietary preference types for registration."""
+    NO_RESTRICTION = "no_restriction"
+    VEGETARIAN = "vegetarian"
+    VEGAN = "vegan"
+    HALAL = "halal"
+    KOSHER = "kosher"
+    GLUTEN_FREE = "gluten_free"
+    DAIRY_FREE = "dairy_free"
+    NUT_FREE = "nut_free"

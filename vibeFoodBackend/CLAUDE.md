@@ -50,24 +50,21 @@ app/
 ## API Design
 
 - Base path: `/api/v1`
-- Session-based (no auth in MVP) - 1 hour TTL
-- 8 endpoints defined in `API_SPEC_MVP.md`:
-  1. `POST /sessions` - Create session
-  2. `POST /sessions/{id}/scan-menu` - OCR menu photo
-  3. `POST /sessions/{id}/vibes` - Submit vibe selection
-  4. `POST /sessions/{id}/recommendations` - Get AI recommendations
-  5. `POST /sessions/{id}/confirm` - Confirm dish selection
-  6. `POST /sessions/{id}/feedback` - Submit feedback
-  7. `GET /sessions/{id}` - Resume/debug session
-  8. `GET /healthz` - Health check
+- Device-based identification (no auth in MVP) - uses unique Device ID
+- 5 endpoints defined in `MVP Data Flow.md`:
+  1. `POST /check-in` - Check if device is registered (called on every app open)
+  2. `POST /register` - Register new user with Device ID and preference selection
+  3. `POST /scan` - Upload menu photo (Base64) and run OCR
+  4. `POST /recommendation` - Get AI recommendations based on vibe selection
+  5. `POST /feedback` - Submit feedback after user filters recommendation list
 
-## Key Design Decisions (from API_SPEC_MVP.md)
+## Key Design Decisions (from MVP Data Flow.md)
 
-- No user authentication for MVP (device_id for returning users)
+- No user authentication for MVP (Device ID for user identification)
 - Menu photo data is ephemeral (deleted after OCR, privacy-first)
-- Confidence scores on all AI outputs for trust/transparency
 - Warnings array pattern for allergen safety
 - SQLite sufficient for 10-100 test users
+- User profile stores: Device ID, preferences, current menu, vibe, recommendations, and feedback
 
 ## Vibe Types
 
