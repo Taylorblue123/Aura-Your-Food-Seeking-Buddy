@@ -2,12 +2,51 @@
 Fake OCR service for MVP testing.
 Returns predefined Thai menu items instead of actual OCR processing.
 """
+from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 from uuid import uuid4
 
-from app.models.domain import MenuItem, MenuData, Restaurant
 from app.models.enums import ExtractionMethod
+
+
+@dataclass
+class MenuItem:
+    """Represents a single menu item extracted from OCR."""
+    id: str
+    name: str
+    description: Optional[str] = None
+    price: Optional[float] = None
+    currency: str = "USD"
+    category: Optional[str] = None
+    tags: List[str] = field(default_factory=list)
+    allergens: List[str] = field(default_factory=list)
+    spice_level: Optional[int] = None
+    is_vegetarian: bool = False
+    is_vegan: bool = False
+    confidence: float = 1.0
+
+
+@dataclass
+class Restaurant:
+    """Restaurant information extracted from menu."""
+    name: Optional[str] = None
+    cuisine_type: Optional[str] = None
+    address: Optional[str] = None
+
+
+@dataclass
+class MenuData:
+    """Complete menu data from OCR extraction."""
+    id: str
+    session_id: str
+    items: List[MenuItem] = field(default_factory=list)
+    restaurant: Optional[Restaurant] = None
+    extraction_method: ExtractionMethod = ExtractionMethod.OCR
+    confidence: float = 0.0
+    extracted_at: datetime = field(default_factory=datetime.utcnow)
+    raw_text: Optional[str] = None
+    warnings: List[str] = field(default_factory=list)
 
 
 # Predefined fake Thai menu items
