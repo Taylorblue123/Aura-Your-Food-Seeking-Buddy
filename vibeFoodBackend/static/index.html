@@ -1180,7 +1180,7 @@
     <div class="upload-area" id="upload-area">
       <div class="cam-icon">📷</div>
       <p class="upload-text">Tap to take a photo or choose from gallery</p>
-      <input type="file" id="file-input" accept="image/*" capture="environment">
+      <input type="file" id="file-input" accept="image/*">
     </div>
     <div id="scan-loader" class="scan-loader hidden">
       <div class="scan-loader-text font-greeting">Reading your menu...</div>
@@ -1366,6 +1366,8 @@ const TRANSLATIONS = {
     scanUploadText: 'Tap to take a photo or choose from gallery',
     scanButton: 'Scan Menu',
     scanLoading: 'Reading your menu...',
+    noMenuFound: "We didn't find any dishes on this image. Try a clearer photo of the menu.",
+    retryPhoto: 'Try another photo',
     // Voice
     orDivider: 'or',
     holdToSpeak: 'Hold to speak',
@@ -1421,6 +1423,8 @@ const TRANSLATIONS = {
     scanUploadText: '点击拍照或从相册选择',
     scanButton: '扫描菜单',
     scanLoading: '正在识别菜单...',
+    noMenuFound: '我们没有在这张图片上找到菜品，请尝试拍一张更清晰的菜单照片。',
+    retryPhoto: '换一张照片',
     orDivider: '或者',
     holdToSpeak: '按住说话',
     recording: '正在聆听...',
@@ -1646,10 +1650,30 @@ document.getElementById('btn-scan').addEventListener('click', async () => {
 
   try {
     const data = await api('/scan', { device_id: deviceId, image_base64: imageBase64 });
-    if (data.is_success) {
+    if (data.is_success && data.menu_item_count > 0) {
       setOrbThinking(false);
       renderRestaurantIntro(data);
       showScreen('screen-restaurant', 'top');
+    } else if (data.is_success && (!data.menu_item_count || data.menu_item_count === 0)) {
+      // Scan succeeded but no dishes found — let user retry
+      setOrbThinking(false);
+      setOrbMode('top');
+      document.getElementById('scan-loader').classList.add('hidden');
+      uploadArea.classList.remove('hidden');
+      uploadArea.innerHTML = `
+        <div class="cam-icon">🔍</div>
+        <p class="upload-text" style="color:var(--terracotta);font-weight:600;">${t('noMenuFound')}</p>
+        <button class="btn-primary" style="margin-top:16px;max-width:220px;" onclick="document.getElementById('file-input-retry').click()">${t('retryPhoto')}</button>
+        <input type="file" id="file-input-retry" accept="image/*" style="display:none">
+      `;
+      document.getElementById('file-input-retry').addEventListener('change', async (ev) => {
+        const file = ev.target.files[0];
+        if (!file) return;
+        imageBase64 = await compressImage(file, 1600, 0.8);
+        uploadArea.innerHTML = `<img src="data:image/jpeg;base64,${imageBase64}" alt="Menu preview">`;
+        btn.disabled = false;
+      });
+      btn.disabled = true;
     } else {
       alert(data.err_msg || 'Menu scan failed');
       document.getElementById('scan-loader').classList.add('hidden');
@@ -2381,7 +2405,7 @@ document.getElementById('btn-new-menu').addEventListener('click', () => {
   area.innerHTML = `
     <div class="cam-icon">📷</div>
     <p class="upload-text">${t('scanUploadText')}</p>
-    <input type="file" id="file-input" accept="image/*" capture="environment">
+    <input type="file" id="file-input" accept="image/*">
   `;
   area.classList.remove('hidden');
   document.getElementById('scan-loader').classList.add('hidden');
