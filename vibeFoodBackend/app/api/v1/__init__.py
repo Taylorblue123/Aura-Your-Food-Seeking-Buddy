@@ -11,6 +11,7 @@ from app.api.v1.endpoints import (
     scan,
     recommendation,
     feedback,
+    transcribe,
 )
 
 api_router = APIRouter()
@@ -21,6 +22,7 @@ api_router.include_router(register.router, prefix="/register", tags=["mvp"])
 api_router.include_router(scan.router, prefix="/scan", tags=["mvp"])
 api_router.include_router(recommendation.router, prefix="/recommendation", tags=["mvp"])
 api_router.include_router(feedback.router, prefix="/feedback", tags=["mvp"])
+api_router.include_router(transcribe.router, prefix="/transcribe", tags=["mvp"])
 
 # Health check endpoint
 api_router.include_router(health.router, prefix="/healthz", tags=["health"])

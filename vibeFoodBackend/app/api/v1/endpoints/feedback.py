@@ -12,38 +12,62 @@ from app.schemas.mvp_feedback import MVPFeedbackRequest, MVPFeedbackResponse
 router = APIRouter()
 
 
+FEEDBACK_STRINGS = {
+    "en": {
+        "quick": "You made a quick decision!",
+        "careful": "You took your time to choose carefully.",
+        "thoughtful": "You were thoughtful in your selection.",
+        "nothing": "Looks like nothing caught your eye this time.",
+        "loved_all": "You loved everything we recommended!",
+        "mild": "You seem to prefer milder flavors.",
+        "great": "Great choices based on your vibe!",
+    },
+    "zh": {
+        "quick": "你做了一个快速的决定！",
+        "careful": "你花了时间仔细选择。",
+        "thoughtful": "你的选择很用心。",
+        "nothing": "看起来这次没有特别吸引你的。",
+        "loved_all": "你喜欢我们推荐的每一道菜！",
+        "mild": "你似乎更喜欢口味温和的菜品。",
+        "great": "根据你的心情，选得很棒！",
+    },
+}
+
+
 def generate_feedback_summary(
     picked_names: list,
     skipped_names: list,
     time_ms: int,
-    recommendations: dict
+    recommendations: dict,
+    menu_language: str = "en",
 ) -> str:
     """
     Generate a personalized feedback summary based on user choices.
     In production, this would call the LLM service.
     """
+    s = FEEDBACK_STRINGS.get(menu_language, FEEDBACK_STRINGS["en"])
+
     # Analyze decision speed
-    decision_speed = ""
-    if time_ms < 30000:  # Less than 30 seconds
-        decision_speed = "You made a quick decision!"
-    elif time_ms < 60000:  # 30-60 seconds
-        decision_speed = "You took your time to choose carefully."
-    else:  # More than 60 seconds
-        decision_speed = "You were thoughtful in your selection."
+    if time_ms < 30000:
+        decision_speed = s["quick"]
+    elif time_ms < 60000:
+        decision_speed = s["careful"]
+    else:
+        decision_speed = s["thoughtful"]
 
     # Analyze preferences
     if len(picked_names) == 0:
-        return f"{decision_speed} Looks like nothing caught your eye this time."
+        return f"{decision_speed} {s['nothing']}"
 
     if len(skipped_names) == 0:
-        return f"{decision_speed} You loved everything we recommended!"
+        return f"{decision_speed} {s['loved_all']}"
 
     # Check for patterns in skipped items
     spicy_skipped = any("spicy" in name.lower() or "curry" in name.lower() for name in skipped_names)
     if spicy_skipped:
-        return f"{decision_speed} You seem to prefer milder flavors."
+        return f"{decision_speed} {s['mild']}"
 
-    return f"{decision_speed} Great choices based on your vibe!"
+    return f"{decision_speed} {s['great']}"
 
 
 def calculate_price_estimate(picked_names: list, recommendations: dict) -> str:
@@ -107,13 +131,16 @@ async def submit_feedback(
 
         # Get current recommendations for price calculation
         recommendations = user_profile.current_recommendations or {}
+        menu_data = user_profile.current_menu or {}
+        menu_language = menu_data.get("menu_language", "en") or "en"
 
         # Generate summary (fake LLM for MVP)
         summary = generate_feedback_summary(
             picked_names=request.picked_dish_names,
             skipped_names=request.skipped_dish_names,
             time_ms=request.time_to_decision_ms,
-            recommendations=recommendations
+            recommendations=recommendations,
+            menu_language=menu_language,
         )
 
         # Calculate price estimate

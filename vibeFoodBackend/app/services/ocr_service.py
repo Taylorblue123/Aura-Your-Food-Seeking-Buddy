@@ -53,6 +53,7 @@ class MenuData:
     extracted_at: datetime = field(default_factory=datetime.utcnow)
     raw_text: Optional[str] = None
     warnings: List[str] = field(default_factory=list)
+    menu_language: Optional[str] = None
 
 
 MENU_EXTRACTION_PROMPT = """You are a restaurant menu OCR extraction system. Extract ALL menu items visible in the image.
@@ -89,7 +90,8 @@ Rules:
 - Set spice_level as 0-5 scale or null if unknown
 - Mark confidence lower if image is blurry or text is hard to read
 - If the image is not a menu, return {"items": [], "confidence": 0.0, "warnings": ["Image does not appear to be a restaurant menu"]}
-- Menu may be in any language. Keep dish names EXACTLY as they appear on the menu. Do NOT translate or modify dish names. If a dish name is in Chinese, keep it in Chinese. Add an English translation in the "description" field if needed."""
+- Menu may be in any language. Keep dish names EXACTLY as they appear on the menu. Do NOT translate or modify dish names. If a dish name is in Chinese, keep it in Chinese. Add an English translation in the "description" field if needed.
+- Detect the dominant language of the menu and include it as a top-level field "menu_language" in your JSON response (e.g., "en", "zh", "ja", "ko", "es", "fr", etc.)."""
 
 
 async def _extract_with_openai(image_base64: str) -> dict:
@@ -172,6 +174,7 @@ def _parse_extraction(data: dict, session_id: str) -> MenuData:
         extracted_at=datetime.utcnow(),
         raw_text=None,
         warnings=warnings,
+        menu_language=data.get("menu_language"),
     )
 
 
@@ -201,6 +204,7 @@ def _get_fake_menu(session_id: str) -> MenuData:
         restaurant=Restaurant(name="Thai Orchid Kitchen", cuisine_type="Thai"),
         extraction_method=ExtractionMethod.OCR, confidence=0.94,
         extracted_at=datetime.utcnow(), raw_text="[Fake OCR - dev mode]", warnings=[],
+        menu_language="en",
     )
 
 

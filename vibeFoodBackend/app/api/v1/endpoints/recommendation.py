@@ -63,16 +63,27 @@ async def get_recommendations(
 
         # Validate vibe selection
         vibe = request.vibe_selection.lower()
-        valid_vibes = [v.value for v in VibeType]
-        if vibe not in valid_vibes:
-            return MVPRecommendationResponse(
-                is_success=False,
-                err_msg=f"Invalid vibe. Must be one of: {', '.join(valid_vibes)}",
-                recommendation=None
-            )
+        voice_prompt = request.voice_prompt
 
-        # Update current vibe in profile
-        user_profile.current_vibe = {"vibe": vibe}
+        if vibe == "voice":
+            # Voice input mode — skip enum validation
+            if not voice_prompt or not voice_prompt.strip():
+                return MVPRecommendationResponse(
+                    is_success=False,
+                    err_msg="Voice prompt is empty. Please try again or select a vibe.",
+                    recommendation=None
+                )
+            user_profile.current_vibe = {"vibe": "voice", "voice_prompt": voice_prompt}
+        else:
+            # Standard vibe mode
+            valid_vibes = [v.value for v in VibeType]
+            if vibe not in valid_vibes:
+                return MVPRecommendationResponse(
+                    is_success=False,
+                    err_msg=f"Invalid vibe. Must be one of: {', '.join(valid_vibes)}",
+                    recommendation=None
+                )
+            user_profile.current_vibe = {"vibe": vibe}
 
         # Get AI-powered recommendations
         menu_data = user_profile.current_menu
@@ -81,6 +92,8 @@ async def get_recommendations(
             vibe=vibe,
             preference=user_profile.preference or "no_restriction",
             restaurant_info=menu_data.get("restaurant"),
+            menu_language=menu_data.get("menu_language"),
+            voice_prompt=voice_prompt,
         )
 
         # Parse into schema objects

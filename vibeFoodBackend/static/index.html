@@ -426,7 +426,77 @@
     line-height: 1.5;
   }
 
-  /* --- Screen 3: Vibe --- */
+  /* --- Screen 3: Restaurant Intro --- */
+  .restaurant-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-top: 40px;
+  }
+  .restaurant-name {
+    font-size: 28px;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+    animation: fade-in 600ms ease both;
+    animation-delay: 100ms;
+  }
+  .cuisine-tag {
+    display: inline-block;
+    padding: 6px 16px;
+    background: var(--cream-shadow);
+    border-radius: var(--radius-round);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    animation: fade-in 500ms ease both;
+    animation-delay: 250ms;
+  }
+  .restaurant-intro-text {
+    font-size: 16px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    max-width: 320px;
+    margin: 0 auto 24px;
+    animation: fade-in-up 600ms ease both;
+    animation-delay: 400ms;
+  }
+  .menu-stats {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    margin-bottom: 16px;
+    animation: fade-in 500ms ease both;
+    animation-delay: 550ms;
+  }
+  .category-pills {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 32px;
+    animation: fade-in-up 500ms ease both;
+    animation-delay: 650ms;
+  }
+  .category-pill {
+    padding: 6px 14px;
+    background: var(--bg-warm);
+    border-radius: var(--radius-round);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--amber);
+    border: 1.5px solid rgba(212,149,106,0.25);
+  }
+  .restaurant-cta {
+    animation: fade-in-up 500ms ease both;
+    animation-delay: 800ms;
+    width: 100%;
+    max-width: 280px;
+  }
+
+  /* --- Screen 4: Vibe --- */
   .vibe-header {
     text-align: center;
     padding-top: 48px;
@@ -580,7 +650,201 @@
     text-align: center;
   }
 
-  /* --- Screen 4: Card Swipe --- */
+  /* --- Voice Record Button --- */
+  .voice-divider {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 8px 40px;
+  }
+  .voice-divider::before, .voice-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cream-shadow), transparent);
+  }
+  .voice-divider-text {
+    font-family: 'Fraunces', Georgia, serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--text-tertiary);
+  }
+
+  .voice-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 0 4px;
+    animation: fade-in 500ms ease both;
+    animation-delay: 500ms;
+  }
+
+  .voice-record-btn {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: none;
+    background: radial-gradient(circle at 38% 32%, var(--orb-a), var(--orb-b));
+    box-shadow: 0 12px 32px -8px rgba(196,101,74,0.4);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 300ms var(--ease-spring), box-shadow 300ms ease;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: none;
+    user-select: none;
+  }
+  .voice-record-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 16px 40px -8px rgba(196,101,74,0.5);
+  }
+  .voice-record-btn.recording {
+    transform: scale(1.15);
+    background: radial-gradient(circle at 38% 32%, var(--terracotta), var(--orb-a));
+    box-shadow: 0 0 0 8px rgba(196,101,74,0.15), 0 16px 40px -8px rgba(196,101,74,0.55);
+  }
+
+  .voice-mic-icon {
+    width: 28px;
+    height: 28px;
+    fill: #FFF8F0;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15));
+    transition: opacity 200ms ease, transform 200ms ease;
+  }
+  .voice-record-btn.recording .voice-mic-icon {
+    opacity: 0;
+    transform: scale(0.6);
+    position: absolute;
+  }
+
+  /* Audio wave bars — visible during recording */
+  .voice-wave {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    height: 32px;
+    opacity: 0;
+    transition: opacity 250ms ease;
+    position: absolute;
+  }
+  .voice-record-btn.recording .voice-wave {
+    opacity: 1;
+  }
+  .voice-wave-bar {
+    width: 4px;
+    min-height: 4px;
+    height: 4px;
+    border-radius: 2px;
+    background: #FFF8F0;
+    transition: height 80ms ease-out;
+  }
+  /* Fallback animation when no analyser data */
+  .voice-record-btn.recording .voice-wave-bar {
+    animation: wave-idle 1.2s ease-in-out infinite;
+  }
+  .voice-wave-bar:nth-child(1) { animation-delay: 0s; }
+  .voice-wave-bar:nth-child(2) { animation-delay: 0.15s; }
+  .voice-wave-bar:nth-child(3) { animation-delay: 0.05s; }
+  .voice-wave-bar:nth-child(4) { animation-delay: 0.2s; }
+  .voice-wave-bar:nth-child(5) { animation-delay: 0.1s; }
+
+  @keyframes wave-idle {
+    0%, 100% { height: 6px; }
+    50% { height: 22px; }
+  }
+  /* When JS drives the heights, disable CSS animation */
+  .voice-wave.live .voice-wave-bar {
+    animation: none;
+  }
+
+  /* Pulse rings during recording */
+  .voice-pulse-ring {
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 2px solid var(--terracotta);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .voice-record-btn.recording .voice-pulse-ring {
+    animation: voice-pulse 1.8s ease-out infinite;
+  }
+  .voice-record-btn.recording .voice-pulse-ring:nth-child(2) {
+    animation-delay: 0.6s;
+  }
+  .voice-record-btn.recording .voice-pulse-ring:nth-child(3) {
+    animation-delay: 1.2s;
+  }
+
+  @keyframes voice-pulse {
+    0% { transform: scale(1); opacity: 0.5; }
+    100% { transform: scale(2.2); opacity: 0; }
+  }
+
+  /* Recording timer */
+  .voice-timer {
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--terracotta);
+    margin-top: 6px;
+    min-height: 18px;
+    opacity: 0;
+    transition: opacity 200ms ease;
+  }
+  .voice-timer.visible { opacity: 1; }
+
+  .voice-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    margin-top: 10px;
+    transition: color 200ms ease;
+  }
+  .voice-record-btn.recording ~ .voice-label {
+    color: var(--terracotta);
+  }
+
+  .voice-hint {
+    font-size: 12px;
+    color: var(--terracotta);
+    text-align: center;
+    padding: 8px 20px;
+    opacity: 0;
+    transition: opacity 300ms ease;
+    min-height: 20px;
+  }
+  .voice-hint.visible { opacity: 1; }
+
+  .voice-transcript-card {
+    background: var(--bg-warm);
+    border-radius: var(--radius-md);
+    padding: 16px 20px;
+    margin: 12px 24px;
+    box-shadow: var(--shadow-card);
+    text-align: center;
+    animation: fade-in-up 400ms ease both;
+  }
+  .voice-transcript-card .transcript-text {
+    font-family: 'Fraunces', Georgia, serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--text-primary);
+    line-height: 1.5;
+  }
+  .voice-transcript-card .transcript-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--text-tertiary);
+    margin-bottom: 6px;
+  }
+
+  /* --- Screen 5: Card Swipe --- */
   .recs-header {
     text-align: center;
     padding-top: 12px;
@@ -906,7 +1170,22 @@
     </div>
   </div>
 
-  <!-- ========== SCREEN 3: PICK VIBE ========== -->
+  <!-- ========== SCREEN 3: RESTAURANT INTRO ========== -->
+  <div id="screen-restaurant" class="screen">
+    <div class="scene-marker">YOUR RESTAURANT</div>
+    <div class="restaurant-content">
+      <h1 class="restaurant-name font-headline" id="rest-name"></h1>
+      <div class="cuisine-tag" id="rest-cuisine"></div>
+      <p class="restaurant-intro-text font-greeting" id="rest-intro"></p>
+      <div class="menu-stats" id="rest-stats"></div>
+      <div class="category-pills" id="rest-categories"></div>
+      <div class="restaurant-cta">
+        <button class="btn-primary" id="btn-pick-vibe">Pick your vibe</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== SCREEN 4: PICK VIBE ========== -->
   <div id="screen-vibe" class="screen">
     <div class="scene-marker">YOUR VIBE</div>
     <div class="vibe-header">
@@ -915,6 +1194,31 @@
     </div>
     <div class="vibe-suggested-label">SUGGESTED FOR YOU</div>
     <div class="vibe-suggested" id="vibe-suggested"></div>
+    <div class="voice-divider">
+      <span class="voice-divider-text" id="voice-divider-text">or</span>
+    </div>
+    <div class="voice-area" id="voice-area">
+      <button class="voice-record-btn" id="voice-record-btn">
+        <div class="voice-pulse-ring"></div>
+        <div class="voice-pulse-ring"></div>
+        <div class="voice-pulse-ring"></div>
+        <svg class="voice-mic-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5z"/>
+          <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+        </svg>
+        <div class="voice-wave" id="voice-wave">
+          <div class="voice-wave-bar"></div>
+          <div class="voice-wave-bar"></div>
+          <div class="voice-wave-bar"></div>
+          <div class="voice-wave-bar"></div>
+          <div class="voice-wave-bar"></div>
+        </div>
+      </button>
+      <span class="voice-label" id="voice-label">Hold to speak</span>
+      <div class="voice-timer" id="voice-timer"></div>
+      <div class="voice-hint" id="voice-hint"></div>
+    </div>
+    <div id="voice-transcript" class="hidden"></div>
     <button class="vibe-more-toggle" id="vibe-more-toggle">
       More vibes <span class="toggle-arrow">&#9662;</span>
     </button>
@@ -924,7 +1228,7 @@
     </div>
   </div>
 
-  <!-- ========== SCREEN 4: RECOMMENDATIONS (CARD SWIPE) ========== -->
+  <!-- ========== SCREEN 5: RECOMMENDATIONS (CARD SWIPE) ========== -->
   <div id="screen-recs" class="screen">
     <div class="recs-header">
       <div class="scene-marker">PICKS FOR YOU</div>
@@ -938,11 +1242,10 @@
     <div id="all-skipped" class="all-skipped-msg hidden"></div>
   </div>
 
-  <!-- ========== SCREEN 5: DONE ========== -->
+  <!-- ========== SCREEN 6: DONE ========== -->
   <div id="screen-done" class="screen">
     <div class="scene-marker">BON APPETIT</div>
     <div class="done-content">
-      <div style="height:120px"></div>
       <h1 class="done-headline font-headline" id="done-headline">Great picks!</h1>
       <div class="done-card" id="done-card"></div>
       <div class="done-actions">
@@ -984,6 +1287,171 @@ const VIBES = [
 
 const SWIPE_THRESHOLD = 100;
 const MAX_ROTATION = 12;
+
+// ============================================================
+// I18N — UI language follows the menu language
+// ============================================================
+const TRANSLATIONS = {
+  en: {
+    // Restaurant intro
+    restaurantMarker: 'YOUR RESTAURANT',
+    cuisineSuffix: ' cuisine',
+    dishesToExplore: (n) => `${n} dishes to explore`,
+    pickYourVibe: 'Pick your vibe',
+    // Vibe screen
+    vibeMarker: 'YOUR VIBE',
+    suggestedLabel: 'SUGGESTED FOR YOU',
+    moreVibes: 'More vibes',
+    vibeLoading: 'Finding something special...',
+    // Contextual greetings
+    greetings: {
+      morning: 'Good morning — something light?',
+      lunch: "Lunch break? Let's make it count.",
+      afternoon: 'Afternoon craving?',
+      evening: 'Evening vibes — what sounds good?',
+      latenight: 'Late night? I got you.',
+    },
+    vibeSub: "Here's what I'd suggest right now.",
+    // Vibe labels & descriptions
+    vibes: {
+      comfort: { label: 'Comfort', desc: 'Warm & familiar' },
+      adventure: { label: 'Adventure', desc: 'Bold & exciting' },
+      light: { label: 'Light', desc: 'Fresh & clean' },
+      quick: { label: 'Quick', desc: 'Fast & easy' },
+      sharing: { label: 'Sharing', desc: 'Great for groups' },
+      budget: { label: 'Budget', desc: 'Best value' },
+      healthy: { label: 'Healthy', desc: 'Nutritious' },
+      indulgent: { label: 'Indulgent', desc: 'Treat yourself' },
+    },
+    // Recs / swipe
+    recsMarker: 'PICKS FOR YOU',
+    swipeHint: '← not today · let\'s go →',
+    swipeRight: "Let's go!",
+    swipeLeft: 'Not today',
+    // All skipped
+    noneOfThese: 'None of these?',
+    noneOfTheseSub: "No worries — let's try a different vibe.",
+    tryDifferentVibes: 'Try different vibes',
+    // Done
+    doneMarker: 'BON APPETIT',
+    doneHeadlines: ['Great picks!', 'Excellent taste!', 'You know what you want!', 'Perfect choices!'],
+    dishSelected: (n) => `${n} dish${n !== 1 ? 'es' : ''} selected`,
+    estimatedLabel: 'Estimated: ',
+    scanAnother: 'Scan another menu',
+    sameMenuNewVibe: 'Same menu, new vibe',
+    // Scan
+    scanMarker: 'MENU SCAN',
+    scanTitle: 'Show me the menu',
+    scanSub: 'Snap a photo or pick one from your gallery.',
+    scanUploadText: 'Tap to take a photo or choose from gallery',
+    scanButton: 'Scan Menu',
+    scanLoading: 'Reading your menu...',
+    // Voice
+    orDivider: 'or',
+    holdToSpeak: 'Hold to speak',
+    recording: 'Listening...',
+    tooShort: 'Hold the button and tell me what you\'re craving',
+    voiceError: 'Couldn\'t hear you — try the vibes instead',
+    voiceTranscribing: 'Understanding what you said...',
+    youSaid: 'YOU SAID',
+  },
+  zh: {
+    restaurantMarker: '餐厅介绍',
+    cuisineSuffix: '料理',
+    dishesToExplore: (n) => `${n} 道菜品等你探索`,
+    pickYourVibe: '选择你的心情',
+    vibeMarker: '你的心情',
+    suggestedLabel: '为你推荐',
+    moreVibes: '更多心情',
+    vibeLoading: '正在为你寻找美食...',
+    greetings: {
+      morning: '早上好——来点清爽的？',
+      lunch: '午餐时间到！吃点好的吧。',
+      afternoon: '下午了，嘴馋了吗？',
+      evening: '晚上想吃点什么？',
+      latenight: '深夜了？我懂你。',
+    },
+    vibeSub: '根据现在的时间，我觉得你可能想要这些。',
+    vibes: {
+      comfort: { label: '治愈', desc: '温暖熟悉的味道' },
+      adventure: { label: '冒险', desc: '大胆尝新' },
+      light: { label: '清爽', desc: '清淡健康' },
+      quick: { label: '快捷', desc: '省时方便' },
+      sharing: { label: '分享', desc: '适合聚餐' },
+      budget: { label: '实惠', desc: '性价比高' },
+      healthy: { label: '健康', desc: '营养均衡' },
+      indulgent: { label: '放纵', desc: '犒劳自己' },
+    },
+    recsMarker: '为你推荐',
+    swipeHint: '← 不想要 · 就它了 →',
+    swipeRight: '就它了！',
+    swipeLeft: '不想要',
+    noneOfThese: '都不想要？',
+    noneOfTheseSub: '没关系——换个心情试试吧。',
+    tryDifferentVibes: '换个心情',
+    doneMarker: '祝你用餐愉快',
+    doneHeadlines: ['选得好！', '好品味！', '你知道自己想要什么！', '完美的选择！'],
+    dishSelected: (n) => `已选 ${n} 道菜`,
+    estimatedLabel: '预估价格：',
+    scanAnother: '扫描新菜单',
+    sameMenuNewVibe: '同菜单，换心情',
+    scanMarker: '菜单扫描',
+    scanTitle: '让我看看菜单',
+    scanSub: '拍张照片或从相册选择。',
+    scanUploadText: '点击拍照或从相册选择',
+    scanButton: '扫描菜单',
+    scanLoading: '正在识别菜单...',
+    orDivider: '或者',
+    holdToSpeak: '按住说话',
+    recording: '正在聆听...',
+    tooShort: '按住按钮，告诉我你想吃什么',
+    voiceError: '没有听清——试试选择心情吧',
+    voiceTranscribing: '正在理解你说的...',
+    youSaid: '你说的是',
+  },
+};
+
+let appLang = 'en';
+
+function t(key) {
+  const lang = TRANSLATIONS[appLang] || TRANSLATIONS.en;
+  return lang[key] !== undefined ? lang[key] : (TRANSLATIONS.en[key] || key);
+}
+
+function setAppLanguage(lang) {
+  appLang = TRANSLATIONS[lang] ? lang : 'en';
+
+  // Update static UI text for post-scan screens
+  // Restaurant intro
+  document.querySelector('#screen-restaurant .scene-marker').textContent = t('restaurantMarker');
+  document.getElementById('btn-pick-vibe').textContent = t('pickYourVibe');
+
+  // Scan screen (for "scan another" flow)
+  document.querySelector('#screen-scan .scene-marker').textContent = t('scanMarker');
+  document.querySelector('.scan-header h1').textContent = t('scanTitle');
+  document.querySelector('.scan-header p').textContent = t('scanSub');
+  document.getElementById('btn-scan').textContent = t('scanButton');
+  document.querySelector('.scan-loader-text').textContent = t('scanLoading');
+
+  // Vibe screen
+  document.querySelector('#screen-vibe .scene-marker').textContent = t('vibeMarker');
+  document.querySelector('.vibe-suggested-label').textContent = t('suggestedLabel');
+  document.querySelector('.vibe-loader-text').textContent = t('vibeLoading');
+  document.getElementById('voice-divider-text').textContent = t('orDivider');
+  document.getElementById('voice-label').textContent = t('holdToSpeak');
+
+  // Recs screen
+  document.querySelector('#screen-recs .scene-marker').textContent = t('recsMarker');
+  document.getElementById('swipe-hint').innerHTML = t('swipeHint');
+
+  // Done screen
+  document.querySelector('#screen-done .scene-marker').textContent = t('doneMarker');
+  document.getElementById('btn-new-menu').textContent = t('scanAnother');
+  document.getElementById('btn-new-vibe-2').textContent = t('sameMenuNewVibe');
+
+  // Re-render vibes with translated labels
+  renderVibes();
+}
 
 // ============================================================
 // STATE
@@ -1160,7 +1628,8 @@ document.getElementById('btn-scan').addEventListener('click', async () => {
     const data = await api('/scan', { device_id: deviceId, image_base64: imageBase64 });
     if (data.is_success) {
       setOrbThinking(false);
-      showScreen('screen-vibe', 'top');
+      renderRestaurantIntro(data);
+      showScreen('screen-restaurant', 'top');
     } else {
       alert(data.err_msg || 'Menu scan failed');
       document.getElementById('scan-loader').classList.add('hidden');
@@ -1180,34 +1649,71 @@ document.getElementById('btn-scan').addEventListener('click', async () => {
 });
 
 // ============================================================
-// SCREEN 3: PICK VIBE (Contextual Presets)
+// SCREEN 3: RESTAURANT INTRO
+// ============================================================
+function renderRestaurantIntro(scanData) {
+  // Set app language based on menu language
+  if (scanData.menu_language) {
+    setAppLanguage(scanData.menu_language);
+  }
+
+  const name = scanData.restaurant_name || 'A new spot';
+  const cuisine = scanData.cuisine_type || '';
+  const count = scanData.menu_item_count || 0;
+  const categories = scanData.menu_categories || [];
+  const intro = scanData.restaurant_intro || '';
+
+  document.getElementById('rest-name').textContent = name;
+
+  const cuisineEl = document.getElementById('rest-cuisine');
+  if (cuisine) {
+    cuisineEl.textContent = cuisine + t('cuisineSuffix');
+    cuisineEl.classList.remove('hidden');
+  } else {
+    cuisineEl.classList.add('hidden');
+  }
+
+  const introEl = document.getElementById('rest-intro');
+  if (intro) {
+    introEl.textContent = intro;
+    introEl.classList.remove('hidden');
+  } else {
+    introEl.classList.add('hidden');
+  }
+
+  document.getElementById('rest-stats').textContent =
+    count > 0 ? t('dishesToExplore')(count) : '';
+
+  const catEl = document.getElementById('rest-categories');
+  if (categories.length > 0) {
+    catEl.innerHTML = categories.slice(0, 6).map(c =>
+      `<span class="category-pill">${escapeHtml(c)}</span>`
+    ).join('');
+    catEl.classList.remove('hidden');
+  } else {
+    catEl.classList.add('hidden');
+  }
+}
+
+document.getElementById('btn-pick-vibe').addEventListener('click', () => {
+  showScreen('screen-vibe', 'top');
+});
+
+// ============================================================
+// SCREEN 4: PICK VIBE (Contextual Presets)
 // ============================================================
 function getContextualVibes(hour) {
+  const greetings = t('greetings');
   if (hour >= 6 && hour < 11) {
-    return {
-      suggested: ['light', 'healthy', 'quick'],
-      greeting: 'Good morning — something light?',
-    };
+    return { suggested: ['light', 'healthy', 'quick'], greeting: greetings.morning };
   } else if (hour >= 11 && hour < 14) {
-    return {
-      suggested: ['quick', 'budget', 'sharing'],
-      greeting: "Lunch break? Let's make it count.",
-    };
+    return { suggested: ['quick', 'budget', 'sharing'], greeting: greetings.lunch };
   } else if (hour >= 14 && hour < 17) {
-    return {
-      suggested: ['light', 'healthy', 'indulgent'],
-      greeting: 'Afternoon craving?',
-    };
+    return { suggested: ['light', 'healthy', 'indulgent'], greeting: greetings.afternoon };
   } else if (hour >= 17 && hour < 21) {
-    return {
-      suggested: ['comfort', 'adventure', 'indulgent', 'sharing'],
-      greeting: 'Evening vibes — what sounds good?',
-    };
+    return { suggested: ['comfort', 'adventure', 'indulgent', 'sharing'], greeting: greetings.evening };
   } else {
-    return {
-      suggested: ['comfort', 'quick', 'indulgent'],
-      greeting: 'Late night? I got you.',
-    };
+    return { suggested: ['comfort', 'quick', 'indulgent'], greeting: greetings.latenight };
   }
 }
 
@@ -1217,7 +1723,11 @@ function renderVibes() {
 
   // Update header
   document.getElementById('vibe-greeting').textContent = ctx.greeting;
-  document.getElementById('vibe-subtitle').textContent = "Here's what I'd suggest right now.";
+  document.getElementById('vibe-subtitle').textContent = t('vibeSub');
+
+  const vibeT = t('vibes');
+  function vibeLabel(v) { return (vibeT[v.value] || {}).label || v.label; }
+  function vibeDesc(v) { return (vibeT[v.value] || {}).desc || v.desc; }
 
   const suggestedVibes = VIBES.filter(v => ctx.suggested.includes(v.value));
   const restVibes = VIBES.filter(v => !ctx.suggested.includes(v.value));
@@ -1227,8 +1737,8 @@ function renderVibes() {
   suggestedEl.innerHTML = suggestedVibes.map((v, i) =>
     `<div class="vibe-bubble suggested" data-value="${v.value}" style="animation-delay:${i * 80}ms">
       <span class="vibe-emoji">${v.emoji}</span>
-      <span class="vibe-label">${v.label}</span>
-      <span class="vibe-desc">${v.desc}</span>
+      <span class="vibe-label">${vibeLabel(v)}</span>
+      <span class="vibe-desc">${vibeDesc(v)}</span>
     </div>`
   ).join('');
 
@@ -1237,13 +1747,14 @@ function renderVibes() {
   restEl.innerHTML = restVibes.map((v, i) =>
     `<div class="vibe-bubble secondary" data-value="${v.value}" style="animation-delay:${i * 60}ms">
       <span class="vibe-emoji">${v.emoji}</span>
-      <span class="vibe-label">${v.label}</span>
-      <span class="vibe-desc">${v.desc}</span>
+      <span class="vibe-label">${vibeLabel(v)}</span>
+      <span class="vibe-desc">${vibeDesc(v)}</span>
     </div>`
   ).join('');
 
   // Toggle button
   const toggleBtn = document.getElementById('vibe-more-toggle');
+  toggleBtn.innerHTML = `${t('moreVibes')} <span class="toggle-arrow">&#9662;</span>`;
   restEl.classList.remove('open');
   toggleBtn.classList.remove('open');
   toggleBtn.onclick = () => {
@@ -1265,6 +1776,8 @@ function renderVibes() {
         restEl.classList.add('hidden');
         toggleBtn.classList.add('hidden');
         document.querySelector('.vibe-suggested-label').classList.add('hidden');
+        document.getElementById('voice-area').classList.add('hidden');
+        document.querySelector('.voice-divider').classList.add('hidden');
         document.getElementById('vibe-loader').classList.remove('hidden');
         setOrbThinking(true);
 
@@ -1293,6 +1806,8 @@ function renderVibes() {
         restEl.classList.remove('hidden');
         toggleBtn.classList.remove('hidden');
         document.querySelector('.vibe-suggested-label').classList.remove('hidden');
+        document.getElementById('voice-area').classList.remove('hidden');
+        document.querySelector('.voice-divider').classList.remove('hidden');
         document.getElementById('vibe-loader').classList.add('hidden');
         setOrbThinking(false);
       }, 350);
@@ -1304,7 +1819,250 @@ function renderVibes() {
 }
 
 // ============================================================
-// SCREEN 4: CARD SWIPE ENGINE
+// VOICE RECORDING
+// ============================================================
+let mediaRecorder = null;
+let audioChunks = [];
+let recordingStartTime = 0;
+let audioContext = null;
+let analyser = null;
+let waveAnimFrame = null;
+let timerInterval = null;
+
+const voiceBtn = document.getElementById('voice-record-btn');
+const voiceLabel = document.getElementById('voice-label');
+const voiceHint = document.getElementById('voice-hint');
+const voiceWave = document.getElementById('voice-wave');
+const voiceTimer = document.getElementById('voice-timer');
+const waveBars = voiceWave.querySelectorAll('.voice-wave-bar');
+
+function showVoiceHint(msg) {
+  voiceHint.textContent = msg;
+  voiceHint.classList.add('visible');
+  setTimeout(() => voiceHint.classList.remove('visible'), 3000);
+}
+
+function getRecorderMimeType() {
+  const types = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg', ''];
+  for (const type of types) {
+    if (!type || MediaRecorder.isTypeSupported(type)) return type || undefined;
+  }
+  return undefined;
+}
+
+function startWaveAnimation(stream) {
+  try {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const source = audioContext.createMediaStreamSource(stream);
+    analyser = audioContext.createAnalyser();
+    analyser.fftSize = 64;
+    source.connect(analyser);
+
+    const dataArray = new Uint8Array(analyser.frequencyBinCount);
+    voiceWave.classList.add('live');
+
+    function updateWave() {
+      analyser.getByteFrequencyData(dataArray);
+      // Map 5 bars to frequency bands
+      const step = Math.floor(dataArray.length / 5);
+      for (let i = 0; i < 5; i++) {
+        const value = dataArray[i * step] / 255;
+        const height = Math.max(4, value * 28);
+        waveBars[i].style.height = height + 'px';
+      }
+      waveAnimFrame = requestAnimationFrame(updateWave);
+    }
+    updateWave();
+  } catch (e) {
+    // Fallback: CSS animation handles it (voice-wave without .live class)
+    voiceWave.classList.remove('live');
+  }
+}
+
+function stopWaveAnimation() {
+  if (waveAnimFrame) { cancelAnimationFrame(waveAnimFrame); waveAnimFrame = null; }
+  if (audioContext) { audioContext.close().catch(() => {}); audioContext = null; }
+  analyser = null;
+  voiceWave.classList.remove('live');
+  waveBars.forEach(bar => bar.style.height = '');
+}
+
+function startTimer() {
+  voiceTimer.classList.add('visible');
+  const start = Date.now();
+  timerInterval = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - start) / 1000);
+    const mins = Math.floor(elapsed / 60);
+    const secs = elapsed % 60;
+    voiceTimer.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+  }, 200);
+}
+
+function stopTimer() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  voiceTimer.classList.remove('visible');
+  voiceTimer.textContent = '';
+}
+
+function stopRecordingCleanup() {
+  voiceBtn.classList.remove('recording');
+  voiceLabel.textContent = t('holdToSpeak');
+  stopWaveAnimation();
+  stopTimer();
+}
+
+function hideVibeUI() {
+  ['vibe-suggested', 'vibe-rest', 'vibe-more-toggle', 'voice-area'].forEach(id =>
+    document.getElementById(id).classList.add('hidden')
+  );
+  document.querySelector('.voice-divider').classList.add('hidden');
+  document.querySelector('.vibe-suggested-label').classList.add('hidden');
+}
+
+function restoreVibeUI() {
+  ['vibe-suggested', 'vibe-rest', 'vibe-more-toggle', 'voice-area'].forEach(id =>
+    document.getElementById(id).classList.remove('hidden')
+  );
+  document.querySelector('.voice-divider').classList.remove('hidden');
+  document.querySelector('.vibe-suggested-label').classList.remove('hidden');
+  document.getElementById('vibe-loader').classList.add('hidden');
+  document.getElementById('voice-transcript').classList.add('hidden');
+}
+
+voiceBtn.addEventListener('pointerdown', async (e) => {
+  e.preventDefault();
+  voiceBtn.setPointerCapture(e.pointerId);
+  voiceHint.classList.remove('visible');
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    audioChunks = [];
+
+    const mimeType = getRecorderMimeType();
+    mediaRecorder = mimeType
+      ? new MediaRecorder(stream, { mimeType })
+      : new MediaRecorder(stream);
+
+    mediaRecorder.ondataavailable = (ev) => {
+      if (ev.data.size > 0) audioChunks.push(ev.data);
+    };
+    mediaRecorder.start();
+    recordingStartTime = Date.now();
+    voiceBtn.classList.add('recording');
+    voiceLabel.textContent = t('recording');
+    startWaveAnimation(stream);
+    startTimer();
+  } catch (err) {
+    showVoiceHint(t('voiceError'));
+  }
+});
+
+voiceBtn.addEventListener('pointerup', async (e) => {
+  if (!mediaRecorder || mediaRecorder.state !== 'recording') return;
+
+  const duration = Date.now() - recordingStartTime;
+  stopRecordingCleanup();
+
+  if (duration < 500) {
+    mediaRecorder.stop();
+    mediaRecorder.stream.getTracks().forEach(tr => tr.stop());
+    mediaRecorder = null;
+    showVoiceHint(t('tooShort'));
+    return;
+  }
+
+  // Stop and collect audio
+  const recorder = mediaRecorder;
+  mediaRecorder = null;
+
+  await new Promise(resolve => {
+    recorder.onstop = resolve;
+    recorder.stop();
+  });
+  recorder.stream.getTracks().forEach(tr => tr.stop());
+
+  const mimeUsed = recorder.mimeType || 'audio/webm';
+  const ext = mimeUsed.includes('mp4') ? 'm4a' : mimeUsed.includes('ogg') ? 'ogg' : 'webm';
+  const audioBlob = new Blob(audioChunks, { type: mimeUsed });
+
+  // Show transcribing state
+  hideVibeUI();
+  document.getElementById('vibe-loader').classList.remove('hidden');
+  document.querySelector('.vibe-loader-text').textContent = t('voiceTranscribing');
+  setOrbThinking(true);
+
+  try {
+    // Step 1: Transcribe
+    const formData = new FormData();
+    formData.append('audio', audioBlob, `recording.${ext}`);
+    const transcribeRes = await fetch(API + '/transcribe', {
+      method: 'POST',
+      body: formData,
+    });
+    const transcribeData = await transcribeRes.json();
+
+    if (!transcribeData.is_success) {
+      throw new Error(transcribeData.err_msg || 'Transcription failed');
+    }
+
+    const transcript = transcribeData.transcript;
+
+    // Step 2: Show transcript briefly
+    setOrbThinking(false);
+    document.getElementById('vibe-loader').classList.add('hidden');
+    const transcriptEl = document.getElementById('voice-transcript');
+    transcriptEl.classList.remove('hidden');
+    transcriptEl.innerHTML = `
+      <div class="voice-transcript-card">
+        <div class="transcript-label">${t('youSaid')}</div>
+        <div class="transcript-text">"${escapeHtml(transcript)}"</div>
+      </div>
+    `;
+
+    // Step 3: After brief display, submit to recommendation
+    await new Promise(r => setTimeout(r, 1500));
+    transcriptEl.classList.add('hidden');
+    document.getElementById('vibe-loader').classList.remove('hidden');
+    document.querySelector('.vibe-loader-text').textContent = t('vibeLoading');
+    setOrbThinking(true);
+
+    const data = await api('/recommendation', {
+      device_id: deviceId,
+      vibe_selection: 'voice',
+      voice_prompt: transcript,
+    });
+
+    if (data.is_success && data.recommendation) {
+      recommendations = data.recommendation.recommendations;
+      pickedDishes = [];
+      skippedDishes = [];
+      currentCardIndex = 0;
+      recScreenTime = Date.now();
+      initCardStack(data.recommendation.brief_summary);
+      setOrbThinking(false);
+      showScreen('screen-recs', 'top');
+    } else {
+      throw new Error(data.err_msg || 'Recommendation failed');
+    }
+  } catch (err) {
+    showVoiceHint(t('voiceError'));
+    setOrbThinking(false);
+  }
+
+  restoreVibeUI();
+});
+
+voiceBtn.addEventListener('pointercancel', () => {
+  if (mediaRecorder && mediaRecorder.state === 'recording') {
+    mediaRecorder.stop();
+    mediaRecorder.stream.getTracks().forEach(tr => tr.stop());
+    mediaRecorder = null;
+  }
+  stopRecordingCleanup();
+});
+
+// ============================================================
+// SCREEN 5: CARD SWIPE ENGINE
 // ============================================================
 function initCardStack(summary) {
   document.getElementById('rec-summary').textContent = summary;
@@ -1350,10 +2108,10 @@ function renderCardStack() {
 
     card.innerHTML = `
       <div class="swipe-overlay swipe-overlay-right">
-        <span class="swipe-overlay-label">Let's go!</span>
+        <span class="swipe-overlay-label">${t('swipeRight')}</span>
       </div>
       <div class="swipe-overlay swipe-overlay-left">
-        <span class="swipe-overlay-label">Not today</span>
+        <span class="swipe-overlay-label">${t('swipeLeft')}</span>
       </div>
       <div class="card-emoji-strip">${rec.emoji || '🍽️'}</div>
       <div class="card-body">
@@ -1501,9 +2259,9 @@ async function submitFeedback() {
     const allSkipped = document.getElementById('all-skipped');
     allSkipped.classList.remove('hidden');
     allSkipped.innerHTML = `
-      <h2 class="font-headline">None of these?</h2>
-      <p>No worries — let's try a different vibe.</p>
-      <button class="btn-primary" id="btn-retry-vibe">Try different vibes</button>
+      <h2 class="font-headline">${t('noneOfThese')}</h2>
+      <p>${t('noneOfTheseSub')}</p>
+      <button class="btn-primary" id="btn-retry-vibe">${t('tryDifferentVibes')}</button>
     `;
     document.getElementById('btn-retry-vibe').addEventListener('click', () => {
       showScreen('screen-vibe', 'top');
@@ -1520,7 +2278,6 @@ async function submitFeedback() {
     return;
   }
 
-  setOrbMode('center');
   setOrbThinking(true);
 
   try {
@@ -1533,18 +2290,19 @@ async function submitFeedback() {
 
     setOrbThinking(false);
 
-    const headlines = ['Great picks!', 'Excellent taste!', 'You know what you want!', 'Perfect choices!'];
+    const headlines = t('doneHeadlines');
     document.getElementById('done-headline').textContent =
       headlines[Math.floor(Math.random() * headlines.length)];
 
+    const count = data.picked_count || pickedDishes.length;
     const card = document.getElementById('done-card');
     card.innerHTML = `
       <div class="done-emoji">🎉</div>
-      <div class="done-count">${data.picked_count || pickedDishes.length} dish${(data.picked_count || pickedDishes.length) !== 1 ? 'es' : ''} selected</div>
-      <div class="done-price">${data.total_price_estimate ? 'Estimated: ' + data.total_price_estimate : ''}</div>
-      <div class="done-summary">${data.summary || 'Enjoy your meal!'}</div>
+      <div class="done-count">${t('dishSelected')(count)}</div>
+      <div class="done-price">${data.total_price_estimate ? t('estimatedLabel') + data.total_price_estimate : ''}</div>
+      <div class="done-summary">${data.summary || ''}</div>
     `;
-    showScreen('screen-done', 'center');
+    showScreen('screen-done', 'top');
   } catch (err) {
     alert('Network error. Please try again.');
     setOrbThinking(false);
@@ -1563,7 +2321,7 @@ document.getElementById('btn-new-menu').addEventListener('click', () => {
   const area = document.getElementById('upload-area');
   area.innerHTML = `
     <div class="cam-icon">📷</div>
-    <p class="upload-text">Tap to take a photo or choose from gallery</p>
+    <p class="upload-text">${t('scanUploadText')}</p>
     <input type="file" id="file-input" accept="image/*" capture="environment">
   `;
   area.classList.remove('hidden');

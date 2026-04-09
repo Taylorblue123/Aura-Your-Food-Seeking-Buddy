@@ -28,7 +28,11 @@ class MVPRecommendationRequest(BaseModel):
         description="Unique device identifier"
     )
     vibe_selection: str = Field(
-        description="Selected vibe (comfort, adventure, light, quick, sharing, budget, healthy, indulgent)"
+        description="Selected vibe (comfort, adventure, light, quick, sharing, budget, healthy, indulgent) or 'voice' for voice input"
+    )
+    voice_prompt: Optional[str] = Field(
+        default=None,
+        description="Free-form text from voice transcription (used when vibe_selection is 'voice')"
     )
 
 

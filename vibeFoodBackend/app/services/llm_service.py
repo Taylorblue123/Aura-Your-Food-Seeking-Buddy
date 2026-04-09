@@ -58,7 +58,69 @@ Rules:
 - Price must match the menu price exactly
 - Keep reasoning and story concise and warm in tone
 - If the menu has very few items, recommend all that fit
-- warnings should be null (not empty array) if there are no warnings"""
+- warnings should be null (not empty array) if there are no warnings
+- CRITICAL: Write the brief_summary, reasoning, story, and warnings in the SAME LANGUAGE as the menu. If the menu language is "zh" (Chinese), write all text fields in Chinese. If "ja", write in Japanese. If "en" or unspecified, write in English. Dish names must remain exactly as they appear on the menu regardless of language."""
+
+
+RESTAURANT_INTRO_PROMPT = """You are Gusto, a warm and friendly food companion. Given restaurant info extracted from a menu, write a 2-3 sentence introduction as if you're a friend telling someone about this place.
+
+Rules:
+- Be warm, specific, and make them excited to eat here
+- Mention the cuisine style and what makes the menu interesting
+- Never use star ratings, review counts, or review language
+- Never say "I recommend" — save recommendations for later
+- Keep it under 50 words
+- Write in first person as Gusto talking to the user
+- CRITICAL: You MUST write your response in the SAME LANGUAGE as the menu. If the menu language is "zh" (Chinese), write entirely in Chinese. If "ja", write in Japanese. If "en" or unspecified, write in English. Match the language the diners would read.
+
+Return ONLY the introduction text, no JSON, no quotes."""
+
+
+async def generate_restaurant_intro(
+    restaurant_name: Optional[str],
+    cuisine_type: Optional[str],
+    categories: List[str],
+    sample_items: List[str],
+    menu_language: Optional[str] = None,
+) -> Optional[str]:
+    """
+    Generate a warm 2-3 sentence restaurant intro using GPT-4o.
+    Returns None if generation fails or API key not set.
+    """
+    if not settings.OPENAI_API_KEY:
+        # Fallback template for dev mode
+        name = restaurant_name or "This place"
+        cuisine = f" {cuisine_type}" if cuisine_type else ""
+        return f"{name} serves{cuisine} cuisine with a nice variety to explore. I think you'll find something great here!"
+
+    try:
+        from app.services.openai_client import get_openai_client
+        client = get_openai_client()
+
+        name = restaurant_name or "this restaurant"
+        cuisine = cuisine_type or "varied"
+        cats = ", ".join(categories[:5]) if categories else "various dishes"
+        samples = ", ".join(sample_items[:6]) if sample_items else ""
+        lang = menu_language or "en"
+
+        user_msg = f"""Restaurant: {name}
+Cuisine: {cuisine}
+Menu sections: {cats}
+Sample dishes: {samples}
+Menu language: {lang}"""
+
+        response = await client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": RESTAURANT_INTRO_PROMPT},
+                {"role": "user", "content": user_msg},
+            ],
+            timeout=10.0,
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        logger.warning("Restaurant intro generation failed: %s", e)
+        return None
 
 
 async def generate_recommendations(
@@ -66,6 +128,8 @@ async def generate_recommendations(
     vibe: str,
     preference: str,
     restaurant_info: Optional[Dict] = None,
+    menu_language: Optional[str] = None,
+    voice_prompt: Optional[str] = None,
 ) -> Dict:
     """
     Generate dish recommendations using GPT-4o.
@@ -75,10 +139,10 @@ async def generate_recommendations(
     """
     if not settings.OPENAI_API_KEY:
         logger.warning("OPENAI_API_KEY not set — returning fallback recommendations")
-        return _get_fallback(vibe)
+        return _get_fallback(vibe if vibe != "voice" else "comfort")
 
     try:
-        return await _call_openai(menu_items, vibe, preference, restaurant_info)
+        return await _call_openai(menu_items, vibe, preference, restaurant_info, menu_language, voice_prompt)
     except Exception as e:
         logger.error("LLM recommendation error: %s", e)
         raise LLMFailedError(message=f"Recommendation generation failed: {str(e)}")
@@ -89,6 +153,8 @@ async def _call_openai(
     vibe: str,
     preference: str,
     restaurant_info: Optional[dict],
+    menu_language: Optional[str] = None,
+    voice_prompt: Optional[str] = None,
 ) -> dict:
     """Call OpenAI GPT-4o for recommendations."""
     from app.services.openai_client import get_openai_client
@@ -101,10 +167,18 @@ async def _call_openai(
         cuisine = restaurant_info.get("cuisine_type", "Unknown")
         restaurant_context = f"\nRestaurant: {name} ({cuisine} cuisine)"
 
-    menu_text = json.dumps(menu_items, indent=2)
+    lang = menu_language or "en"
+    menu_text = json.dumps(menu_items, indent=2, ensure_ascii=False)
 
-    user_message = f"""User's vibe: {vibe} — {VIBE_DESCRIPTIONS.get(vibe, '')}
+    # Voice prompt overrides fixed vibe description
+    if voice_prompt and vibe == "voice":
+        vibe_line = f"User's request (in their own words): {voice_prompt}"
+    else:
+        vibe_line = f"User's vibe: {vibe} — {VIBE_DESCRIPTIONS.get(vibe, '')}"
+
+    user_message = f"""{vibe_line}
 User's dietary preference: {preference}
+Menu language: {lang}
 {restaurant_context}
 
 Menu items:
