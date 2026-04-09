@@ -1828,6 +1828,8 @@ let audioContext = null;
 let analyser = null;
 let waveAnimFrame = null;
 let timerInterval = null;
+let isPointerDown = false;  // Track pointer state across async gap
+let activeStream = null;    // Track stream for cleanup
 
 const voiceBtn = document.getElementById('voice-record-btn');
 const voiceLabel = document.getElementById('voice-label');
@@ -1933,11 +1935,27 @@ voiceBtn.addEventListener('pointerdown', async (e) => {
   e.preventDefault();
   voiceBtn.setPointerCapture(e.pointerId);
   voiceHint.classList.remove('visible');
+  isPointerDown = true;
+
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (err) {
+    isPointerDown = false;
+    showVoiceHint(t('voiceError'));
+    return;
+  }
+
+  // User may have released finger while permission prompt was showing
+  if (!isPointerDown) {
+    stream.getTracks().forEach(tr => tr.stop());
+    return;
+  }
+
+  activeStream = stream;
+  audioChunks = [];
 
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    audioChunks = [];
-
     const mimeType = getRecorderMimeType();
     mediaRecorder = mimeType
       ? new MediaRecorder(stream, { mimeType })
@@ -1946,40 +1964,49 @@ voiceBtn.addEventListener('pointerdown', async (e) => {
     mediaRecorder.ondataavailable = (ev) => {
       if (ev.data.size > 0) audioChunks.push(ev.data);
     };
-    mediaRecorder.start();
+    // Use timeslice to collect data periodically (not just on stop)
+    mediaRecorder.start(250);
     recordingStartTime = Date.now();
     voiceBtn.classList.add('recording');
     voiceLabel.textContent = t('recording');
     startWaveAnimation(stream);
     startTimer();
   } catch (err) {
+    stream.getTracks().forEach(tr => tr.stop());
+    activeStream = null;
+    isPointerDown = false;
     showVoiceHint(t('voiceError'));
   }
 });
 
-voiceBtn.addEventListener('pointerup', async (e) => {
-  if (!mediaRecorder || mediaRecorder.state !== 'recording') return;
+async function handleRecordingStop() {
+  if (!mediaRecorder) return;
 
   const duration = Date.now() - recordingStartTime;
+  const recorder = mediaRecorder;
+  mediaRecorder = null;
   stopRecordingCleanup();
 
   if (duration < 500) {
-    mediaRecorder.stop();
-    mediaRecorder.stream.getTracks().forEach(tr => tr.stop());
-    mediaRecorder = null;
+    recorder.stop();
+    if (activeStream) activeStream.getTracks().forEach(tr => tr.stop());
+    activeStream = null;
     showVoiceHint(t('tooShort'));
     return;
   }
 
-  // Stop and collect audio
-  const recorder = mediaRecorder;
-  mediaRecorder = null;
-
+  // Stop and wait for final data
   await new Promise(resolve => {
     recorder.onstop = resolve;
     recorder.stop();
   });
-  recorder.stream.getTracks().forEach(tr => tr.stop());
+  if (activeStream) activeStream.getTracks().forEach(tr => tr.stop());
+  activeStream = null;
+
+  if (audioChunks.length === 0) {
+    showVoiceHint(t('voiceError'));
+    return;
+  }
 
   const mimeUsed = recorder.mimeType || 'audio/webm';
   const ext = mimeUsed.includes('mp4') ? 'm4a' : mimeUsed.includes('ogg') ? 'ogg' : 'webm';
@@ -2050,14 +2077,25 @@ voiceBtn.addEventListener('pointerup', async (e) => {
   }
 
   restoreVibeUI();
+}
+
+voiceBtn.addEventListener('pointerup', (e) => {
+  isPointerDown = false;
+  if (mediaRecorder && mediaRecorder.state === 'recording') {
+    handleRecordingStop();
+  }
 });
 
 voiceBtn.addEventListener('pointercancel', () => {
+  isPointerDown = false;
   if (mediaRecorder && mediaRecorder.state === 'recording') {
     mediaRecorder.stop();
-    mediaRecorder.stream.getTracks().forEach(tr => tr.stop());
-    mediaRecorder = null;
   }
+  if (activeStream) {
+    activeStream.getTracks().forEach(tr => tr.stop());
+    activeStream = null;
+  }
+  mediaRecorder = null;
   stopRecordingCleanup();
 });
 
