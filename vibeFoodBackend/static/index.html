@@ -44,8 +44,12 @@
     --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
+  html, body {
+    overscroll-behavior: none;
+    overflow-x: hidden;
+  }
   body {
     font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--bg);
@@ -53,7 +57,6 @@
     min-height: 100dvh;
     display: flex;
     justify-content: center;
-    overflow-x: hidden;
   }
 
   .app {
@@ -63,7 +66,8 @@
     display: flex;
     flex-direction: column;
     position: relative;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
   /* --- Typography --- */
@@ -677,6 +681,9 @@
     padding: 8px 0 4px;
     animation: fade-in 500ms ease both;
     animation-delay: 500ms;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
   }
 
   .voice-record-btn {
@@ -695,6 +702,8 @@
     -webkit-tap-highlight-color: transparent;
     touch-action: none;
     user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
   }
   .voice-record-btn:hover {
     transform: scale(1.05);
@@ -712,6 +721,9 @@
     fill: #FFF8F0;
     filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15));
     transition: opacity 200ms ease, transform 200ms ease;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
   }
   .voice-record-btn.recording .voice-mic-icon {
     opacity: 0;
@@ -845,6 +857,10 @@
   }
 
   /* --- Screen 5: Card Swipe --- */
+  #screen-recs {
+    overflow: hidden;
+    touch-action: none;
+  }
   .recs-header {
     text-align: center;
     padding-top: 12px;
@@ -868,7 +884,9 @@
     align-items: center;
     justify-content: center;
     min-height: 380px;
-    touch-action: pan-y;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
   }
   .card-stack {
     position: relative;
@@ -886,6 +904,8 @@
     overflow: hidden;
     touch-action: none;
     user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
     display: flex;
     flex-direction: column;
     will-change: transform;
@@ -2189,6 +2209,7 @@ function attachSwipeEvents(card, idx) {
 
   card.addEventListener('pointerdown', (e) => {
     if (e.button !== 0) return;
+    e.preventDefault();
     isDragging = true;
     isHorizontal = null;
     startX = e.clientX;
