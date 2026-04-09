@@ -52,7 +52,11 @@ Return a JSON object:
 Rules:
 - ONLY recommend dishes that appear on the provided menu
 - Use the EXACT dish name as it appears in the menu data — do NOT translate, rephrase, or modify dish names
-- Recommend 3-5 dishes, prioritized by vibe fit
+- The NUMBER of dishes to recommend should reflect the user's context:
+  - If the user says they're alone, eating light, or just want a quick bite → recommend 1-2 dishes
+  - If the user picks a standard vibe or gives no group size hint → recommend 3-4 dishes
+  - If the user mentions a group, sharing, many people, or a big meal → recommend 4-6 dishes
+  - Use common sense: "随便吃点" (just grab something) = 1-2, "人很多" (lots of people) = 5-6
 - If user has dietary restrictions, ALWAYS flag conflicts in warnings
 - If a dish conflicts with the user's dietary preference, you may still include it if it's an exceptional vibe match, but add a clear warning
 - Price must match the menu price exactly
