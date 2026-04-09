@@ -1151,7 +1151,7 @@
 <div class="app">
 
   <!-- Gusto Orb (persistent) -->
-  <div class="orb-wrap center" id="orb-wrap">
+  <div class="orb-wrap top" id="orb-wrap">
     <div class="orb" id="orb"></div>
   </div>
 
@@ -1159,7 +1159,6 @@
   <div id="screen-welcome" class="screen active">
     <div class="scene-marker">FIRST TIME</div>
     <div class="welcome-content">
-      <div style="height:140px"></div>
       <h1 class="welcome-greeting font-greeting">Hey, I'm Gusto.</h1>
       <p class="welcome-sub">Your food-finding buddy. Tell me what you can't eat, and I'll take care of the rest.</p>
       <div class="pref-section">
@@ -1645,7 +1644,6 @@ document.getElementById('btn-scan').addEventListener('click', async () => {
   btn.disabled = true;
   document.getElementById('scan-loader').classList.remove('hidden');
   uploadArea.classList.add('hidden');
-  setOrbMode('center');
   setOrbThinking(true);
 
   try {
@@ -2443,10 +2441,10 @@ async function init() {
       currentScreenId = 'screen-scan';
       setOrbMode('top');
     } else {
-      setOrbMode('center');
+      setOrbMode('top');
     }
   } catch (err) {
-    setOrbMode('center');
+    setOrbMode('top');
   }
 }
 
