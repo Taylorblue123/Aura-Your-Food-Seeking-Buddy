@@ -180,8 +180,11 @@ async def _call_openai(
     else:
         vibe_line = f"User's vibe: {vibe} — {VIBE_DESCRIPTIONS.get(vibe, '')}"
 
+    # Format preferences — may be comma-separated (e.g. "vegetarian,nut_free")
+    pref_display = preference.replace(",", ", ") if preference else "no_restriction"
+
     user_message = f"""{vibe_line}
-User's dietary preference: {preference}
+User's dietary restrictions: {pref_display}
 Menu language: {lang}
 {restaurant_context}
 

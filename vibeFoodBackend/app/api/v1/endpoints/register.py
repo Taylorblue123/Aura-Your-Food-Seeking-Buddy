@@ -38,10 +38,11 @@ async def register(request: RegisterRequest, db: Session = Depends(get_db)):
                 err_msg="Device already registered"
             )
 
-        # Create new user profile
+        # Create new user profile — store preferences as comma-separated string
+        pref_str = ",".join(request.preference) if request.preference else "no_restriction"
         user_profile = UserProfile(
             device_id=request.device_id,
-            preference=request.preference
+            preference=pref_str
         )
 
         db.add(user_profile)

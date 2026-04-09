@@ -3,7 +3,7 @@ Registration endpoint schemas.
 Used to register new users with Device ID and preference.
 """
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import List, Optional
 
 from app.models.enums import PreferenceType
 
@@ -13,8 +13,8 @@ class RegisterRequest(BaseModel):
     device_id: str = Field(
         description="Unique device identifier"
     )
-    preference: str = Field(
-        description="User's preference selection (e.g., vegetarian, vegan, no_restriction)"
+    preference: List[str] = Field(
+        description="User's dietary preference selections (e.g., ['vegetarian', 'nut_free']). Send ['no_restriction'] if none."
     )
 
 

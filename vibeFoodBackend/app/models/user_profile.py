@@ -27,7 +27,7 @@ class UserProfile(Base):
     __tablename__ = "user_profiles"
 
     device_id = Column(String(255), primary_key=True, index=True)
-    preference = Column(String(50), nullable=True)
+    preference = Column(String(255), nullable=True)
     current_menu = Column(JSON, nullable=True)
     current_vibe = Column(JSON, nullable=True)
     current_recommendations = Column(JSON, nullable=True)

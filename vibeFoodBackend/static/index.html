@@ -1485,7 +1485,7 @@ if (!deviceId) {
   localStorage.setItem('aura_device_id', deviceId);
 }
 
-let selectedPref = null;
+let selectedPrefs = new Set();
 let selectedVibe = null;
 let imageBase64 = null;
 let recommendations = [];
@@ -1572,12 +1572,34 @@ function renderPrefs() {
     </div>`
   ).join('');
 
+  function updatePrefUI() {
+    grid.querySelectorAll('.bubble-btn').forEach(b => {
+      b.classList.toggle('selected', selectedPrefs.has(b.dataset.value));
+    });
+    document.getElementById('btn-register').disabled = selectedPrefs.size === 0;
+  }
+
   grid.querySelectorAll('.bubble-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      grid.querySelectorAll('.bubble-btn').forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-      selectedPref = btn.dataset.value;
-      document.getElementById('btn-register').disabled = false;
+      const val = btn.dataset.value;
+      if (val === 'no_restriction') {
+        // "No limits" clears everything else and selects only itself
+        selectedPrefs.clear();
+        selectedPrefs.add('no_restriction');
+      } else {
+        // Any restriction deselects "no_restriction"
+        selectedPrefs.delete('no_restriction');
+        if (selectedPrefs.has(val)) {
+          selectedPrefs.delete(val);
+        } else {
+          selectedPrefs.add(val);
+        }
+        // If nothing selected, default back to no_restriction
+        if (selectedPrefs.size === 0) {
+          selectedPrefs.add('no_restriction');
+        }
+      }
+      updatePrefUI();
     });
   });
 }
@@ -1587,7 +1609,7 @@ document.getElementById('btn-register').addEventListener('click', async () => {
   btn.disabled = true;
   btn.textContent = 'Setting up...';
   try {
-    const data = await api('/register', { device_id: deviceId, preference: selectedPref });
+    const data = await api('/register', { device_id: deviceId, preference: Array.from(selectedPrefs) });
     if (data.is_success) {
       showScreen('screen-scan', 'top');
     } else {
