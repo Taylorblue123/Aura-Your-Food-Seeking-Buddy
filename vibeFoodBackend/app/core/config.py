@@ -31,6 +31,9 @@ class Settings(BaseSettings):
     DATABASE_POOL_SIZE: int = 20
     DATABASE_MAX_OVERFLOW: int = 40
 
+    # OpenAI配置
+    OPENAI_API_KEY: Optional[str] = None
+
     # Redis配置
     REDIS_URL: Optional[str] = None
 

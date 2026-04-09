@@ -2,6 +2,8 @@
 Recommendation endpoint for Vibe-Food MVP.
 Returns AI-powered dish recommendations based on vibe selection.
 """
+import logging
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -14,180 +16,11 @@ from app.schemas.mvp_recommendation import (
     MVPRecommendationData,
     DishRecommendation,
 )
+from app.services import llm_service
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
-
-# Vibe to emoji mapping
-VIBE_EMOJIS = {
-    "comfort": "🍲",
-    "adventure": "🌶️",
-    "light": "🥗",
-    "quick": "⚡",
-    "sharing": "🍻",
-    "budget": "💰",
-    "healthy": "🥬",
-    "indulgent": "🍰",
-}
-
-# Fake LLM recommendations based on vibe
-VIBE_RECOMMENDATIONS = {
-    "comfort": [
-        DishRecommendation(
-            dish_name="Massaman Curry",
-            reasoning="Rich and mild curry that feels like a warm hug",
-            story="A comfort classic with tender meat and potatoes",
-            warnings=["Contains peanuts - please verify with staff"],
-            price="16",
-            emoji="🍛"
-        ),
-        DishRecommendation(
-            dish_name="Pad Thai",
-            reasoning="A beloved classic with perfect sweet-savory balance",
-            story="The most popular Thai dish for good reason",
-            warnings=["Contains peanuts", "Contains eggs"],
-            price="14",
-            emoji="🍜"
-        ),
-    ],
-    "adventure": [
-        DishRecommendation(
-            dish_name="Tom Yum Soup",
-            reasoning="Bold flavors that awaken your taste buds",
-            story="An exciting journey of sour, spicy, and aromatic notes",
-            warnings=["Very spicy", "Contains shellfish"],
-            price="12",
-            emoji="🌶️"
-        ),
-        DishRecommendation(
-            dish_name="Green Curry",
-            reasoning="Aromatic and spicy with complex flavors",
-            story="A Thai curry adventure with authentic heat",
-            warnings=["Spicy", "Contains coconut"],
-            price="15",
-            emoji="🥘"
-        ),
-    ],
-    "light": [
-        DishRecommendation(
-            dish_name="Spring Rolls",
-            reasoning="Fresh and crispy without being heavy",
-            story="A light start that won't weigh you down",
-            warnings=None,
-            price="7",
-            emoji="🥟"
-        ),
-        DishRecommendation(
-            dish_name="Tom Yum Soup",
-            reasoning="Light broth-based soup full of fresh flavors",
-            story="Refreshing and cleansing for the palate",
-            warnings=["Spicy"],
-            price="9",
-            emoji="🍲"
-        ),
-    ],
-    "quick": [
-        DishRecommendation(
-            dish_name="Pad Thai",
-            reasoning="Quick to prepare and quick to enjoy",
-            story="A fast favorite that never disappoints",
-            warnings=["Contains peanuts"],
-            price="14",
-            emoji="⚡"
-        ),
-        DishRecommendation(
-            dish_name="Spring Rolls",
-            reasoning="Ready fast, perfect for a quick bite",
-            story="Crispy satisfaction in minutes",
-            warnings=None,
-            price="7",
-            emoji="🥟"
-        ),
-    ],
-    "sharing": [
-        DishRecommendation(
-            dish_name="Spring Rolls",
-            reasoning="Perfect for passing around the table",
-            story="A crowd-pleaser that brings people together",
-            warnings=None,
-            price="7",
-            emoji="🥟"
-        ),
-        DishRecommendation(
-            dish_name="Pad Thai",
-            reasoning="A generous portion great for sharing",
-            story="Everyone's favorite to share",
-            warnings=["Contains peanuts"],
-            price="14",
-            emoji="🍜"
-        ),
-    ],
-    "budget": [
-        DishRecommendation(
-            dish_name="Spring Rolls",
-            reasoning="Great value without compromising taste",
-            story="Budget-friendly and delicious",
-            warnings=None,
-            price="7",
-            emoji="💰"
-        ),
-        DishRecommendation(
-            dish_name="Tom Yum Soup",
-            reasoning="Filling and flavorful at a great price",
-            story="Maximum flavor for minimum spend",
-            warnings=["Spicy"],
-            price="9",
-            emoji="🍲"
-        ),
-    ],
-    "healthy": [
-        DishRecommendation(
-            dish_name="Tom Yum Soup",
-            reasoning="Low calorie, high flavor, immune-boosting",
-            story="A healthy choice packed with herbs and spices",
-            warnings=["Spicy"],
-            price="9",
-            emoji="🥗"
-        ),
-        DishRecommendation(
-            dish_name="Spring Rolls",
-            reasoning="Light and veggie-packed",
-            story="Fresh vegetables in a light wrapper",
-            warnings=None,
-            price="7",
-            emoji="🥬"
-        ),
-    ],
-    "indulgent": [
-        DishRecommendation(
-            dish_name="Mango Sticky Rice",
-            reasoning="Sweet, creamy, and absolutely decadent",
-            story="A heavenly dessert you deserve",
-            warnings=["Contains coconut"],
-            price="8",
-            emoji="🥭"
-        ),
-        DishRecommendation(
-            dish_name="Massaman Curry",
-            reasoning="Rich, creamy, and deeply satisfying",
-            story="Treat yourself to this indulgent curry",
-            warnings=["Contains peanuts", "Contains coconut"],
-            price="16",
-            emoji="🍛"
-        ),
-    ],
-}
-
-# Brief summaries by vibe
-VIBE_SUMMARIES = {
-    "comfort": "Here are some warming, comforting dishes to soothe your soul.",
-    "adventure": "Ready for a flavor adventure? These dishes will excite your palate!",
-    "light": "Light and refreshing options that won't weigh you down.",
-    "quick": "Fast favorites when you're short on time but not on taste.",
-    "sharing": "Perfect dishes for bringing the table together.",
-    "budget": "Great taste without breaking the bank.",
-    "healthy": "Nutritious choices that don't sacrifice flavor.",
-    "indulgent": "Go ahead, treat yourself to these decadent delights.",
-}
 
 
 @router.post("", response_model=MVPRecommendationResponse)
@@ -241,16 +74,34 @@ async def get_recommendations(
         # Update current vibe in profile
         user_profile.current_vibe = {"vibe": vibe}
 
-        # Get recommendations based on vibe (fake LLM for MVP)
-        recommendations = VIBE_RECOMMENDATIONS.get(vibe, VIBE_RECOMMENDATIONS["comfort"])
-        summary = VIBE_SUMMARIES.get(vibe, VIBE_SUMMARIES["comfort"])
-
-        # Store recommendations in profile
-        recommendation_data = MVPRecommendationData(
-            brief_summary=summary,
-            recommendations=recommendations
+        # Get AI-powered recommendations
+        menu_data = user_profile.current_menu
+        result = await llm_service.generate_recommendations(
+            menu_items=menu_data.get("items", []),
+            vibe=vibe,
+            preference=user_profile.preference or "no_restriction",
+            restaurant_info=menu_data.get("restaurant"),
         )
 
+        # Parse into schema objects
+        recommendations = [
+            DishRecommendation(
+                dish_name=rec.get("dish_name", "Unknown"),
+                reasoning=rec.get("reasoning", ""),
+                story=rec.get("story", ""),
+                warnings=rec.get("warnings"),
+                price=str(rec.get("price", "Ask staff")),
+                emoji=rec.get("emoji"),
+            )
+            for rec in result.get("recommendations", [])
+        ]
+
+        recommendation_data = MVPRecommendationData(
+            brief_summary=result.get("brief_summary", "Here are our recommendations for you."),
+            recommendations=recommendations,
+        )
+
+        # Store recommendations in profile
         user_profile.current_recommendations = recommendation_data.model_dump()
         db.commit()
 
@@ -262,6 +113,7 @@ async def get_recommendations(
 
     except Exception as e:
         db.rollback()
+        logger.error("Recommendation endpoint error: %s", e)
         return MVPRecommendationResponse(
             is_success=False,
             err_msg=f"Recommendation failed: {str(e)}",

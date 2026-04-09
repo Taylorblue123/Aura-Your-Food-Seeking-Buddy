@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.core.config import settings
 from app.core.database import init_db
@@ -49,12 +50,5 @@ async def app_error_handler(request: Request, exc: AppError):
 # Include API routes
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
-
-@app.get("/")
-async def root():
-    """Root endpoint with API information."""
-    return {
-        "message": "Welcome to Vibe-Food API",
-        "version": settings.VERSION,
-        "docs": f"{settings.API_V1_STR}/openapi.json",
-    }
+# Serve frontend static files (must come after API routes)
+app.mount("/", StaticFiles(directory="static", html=True), name="static")

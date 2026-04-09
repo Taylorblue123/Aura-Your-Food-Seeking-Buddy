@@ -41,9 +41,9 @@ async def scan_menu(request: ScanRequest, db: Session = Depends(get_db)):
                 err_msg="Device not registered. Please register first."
             )
 
-        # Validate and decode base64 image
+        # Validate base64 image data
         try:
-            image_data = base64.b64decode(request.image_base64)
+            base64.b64decode(request.image_base64)
         except Exception:
             return ScanResponse(
                 is_success=False,
@@ -54,7 +54,7 @@ async def scan_menu(request: ScanRequest, db: Session = Depends(get_db)):
         # Using device_id as session_id for MVP
         menu_data = await ocr_service.process_menu_image(
             session_id=request.device_id,
-            image_data=image_data,
+            image_base64=request.image_base64,
         )
 
         # Convert menu_data to JSON-serializable dict
